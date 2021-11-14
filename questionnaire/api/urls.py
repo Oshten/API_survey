@@ -1,11 +1,10 @@
-from django.urls import path, include
-from rest_framework import routers
-from .views import SurveyViewSet
+from django.urls import path
+from .views import SurveyDetalsView, SurveyListView, AnswerCreateView, AnswerView
 
-router = routers.DefaultRouter()
-router.register(r'survey', SurveyViewSet)
 
 urlpatterns = [
-    path('', include(router.urls)),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    path('survey/', SurveyListView.as_view()),
+    path('survey/<int:pk>/', SurveyDetalsView.as_view()),
+    path('answer/', AnswerView.as_view()),
+    path('answer/create/', AnswerCreateView.as_view({'post':'create'}))
 ]

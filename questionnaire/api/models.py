@@ -57,7 +57,12 @@ class Question(models.Model):
     # ]
 
     text_question = models.TextField('Текст вопроса')
-    attachment = models.ForeignKey(Survey, verbose_name='Опрос', on_delete=models.CASCADE)
+    attachment = models.ForeignKey(
+        Survey,
+        verbose_name='Опрос',
+        on_delete=models.CASCADE,
+        related_name='questions'
+    )
     # type_question = models.CharField(
     #     'Тип вопроса',
     #     max_length=30,
@@ -79,11 +84,37 @@ class User(models.Model):
     def __str__(self):
         if self.user_name:
             return self.user_name
-        return id
+        return self.id
 
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
+
+
+class Answer(models.Model):
+    '''Ответы на опрос'''
+    text_answer = models.TextField('Ответ')
+    answer = models.ForeignKey(
+        Question,
+        verbose_name='Вопрос',
+        on_delete=models.CASCADE,
+        related_name='answer'
+    )
+    user_answer = models.ForeignKey(
+            User,
+            verbose_name='Пользователь',
+            on_delete=models.CASCADE,
+            related_name='user_answer'
+        )
+
+    def __str__(self):
+        return self.text_answer
+
+    class Meta:
+        verbose_name = 'Ответ'
+        verbose_name_plural = 'Ответы'
+
+
 
 
 
