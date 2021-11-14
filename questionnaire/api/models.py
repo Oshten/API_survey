@@ -82,8 +82,8 @@ class User(models.Model):
         return id
 
     class Meta:
-        verbose_name = 'Вопрос'
-        verbose_name_plural = 'Вопросы'
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
 
 
 
