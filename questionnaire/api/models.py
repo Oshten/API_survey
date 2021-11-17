@@ -82,17 +82,42 @@ class User(models.Model):
     user_name = models.CharField('Имя пользователя', max_length=30, blank=True)
 
     def __str__(self):
-        if self.user_name:
-            return self.user_name
-        return self.id
+        if not self.user_name:
+            return str(self.id)
+        return self.user_name
 
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
 
 
-class Answer(models.Model):
+class AnswersForSurvay(models.Model):
     '''Ответы на опрос'''
+
+    surway_parent = models.ForeignKey(
+        Survey,
+        verbose_name='Опрос',
+        on_delete=models.CASCADE,
+        related_name='surway_parent'
+    )
+    user_answers = models.ForeignKey(
+        User,
+        verbose_name='Пользователь',
+        on_delete=models.CASCADE,
+        related_name='user_answers'
+    )
+    date_start_answers = models.DateTimeField('Время начала опроса', auto_now_add=True)
+
+    def __str__(self):
+        return self.surway_parent
+
+    class Meta:
+        verbose_name = 'Ответ на опрос'
+        verbose_name_plural = 'Ответы на опрос'
+
+
+class Answer(models.Model):
+    '''Ответ на вопрос'''
     text_answer = models.TextField('Ответ')
     answer = models.ForeignKey(
         Question,
@@ -100,11 +125,11 @@ class Answer(models.Model):
         on_delete=models.CASCADE,
         related_name='answer'
     )
-    user_answer = models.ForeignKey(
-            User,
-            verbose_name='Пользователь',
+    answers_for_survey = models.ForeignKey(
+            AnswersForSurvay,
+            verbose_name='Ответ на опрос',
             on_delete=models.CASCADE,
-            related_name='user_answer'
+            related_name='answers_for_survey'
         )
 
     def __str__(self):
