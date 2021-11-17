@@ -4,13 +4,13 @@ class Survey(models.Model):
 
     '''Опросы'''
 
-    name = models.CharField('Название', max_length=30)
+    survey_name = models.CharField('Название', max_length=30)
     date_start = models.DateField('Дата старта', auto_now_add=True)
     date_finish = models.DateField('Дата окончания', auto_now=True)
     description = models.TextField('Описание')
 
     def __str__(self):
-        return self.name
+        return self.survey_name
 
     class Meta:
         verbose_name = 'Опрос'
@@ -91,7 +91,7 @@ class User(models.Model):
         verbose_name_plural = 'Пользователи'
 
 
-class AnswersForSurvay(models.Model):
+class AnswersForSurvey(models.Model):
     '''Ответы на опрос'''
 
     surway_parent = models.ForeignKey(
@@ -126,7 +126,7 @@ class Answer(models.Model):
         related_name='answer'
     )
     answers_for_survey = models.ForeignKey(
-            AnswersForSurvay,
+            AnswersForSurvey,
             verbose_name='Ответ на опрос',
             on_delete=models.CASCADE,
             related_name='answers_for_survey'

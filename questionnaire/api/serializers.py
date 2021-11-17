@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Question, Survey, User, Answer
+from .models import Question, Survey, User, AnswersForSurvey, Answer
 
 
 class QuestionSerializer(serializers.ModelSerializer):
@@ -18,11 +18,12 @@ class UserSerializer(serializers.ModelSerializer):
 
 class SurveyDetalsSerializer(serializers.ModelSerializer):
     '''Вывод опроса с вопросами'''
-    questions = QuestionSerializer(many=True)
+    questions = QuestionSerializer(read_only=True, many=True)
 
     class Meta:
         model = Survey
-        fields = ('id', 'name', 'description', 'questions')
+        fields = ('id', 'survey_name', 'description', 'questions')
+
 
 
 class SurveySerializer(serializers.ModelSerializer):
@@ -30,7 +31,8 @@ class SurveySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Survey
-        fields = ('id', 'name', 'description')
+        fields = ('id', 'survey_name', 'description')
+
 
 
 class SurveyListSerializer(serializers.ModelSerializer):
@@ -38,14 +40,21 @@ class SurveyListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Survey
-        fields = ('id', 'name', 'description')
+        fields = ('id', 'survey_name', 'description')
 
-class AnswerCreateSerializer(serializers.ModelSerializer):
-    '''Добавление ответов на вопросы'''
+class CreateAnswersForSurveySerializer(serializers.ModelSerializer):
+    '''Добавление ответов на опрос'''
 
     class Meta:
-        model = Answer
+        model = AnswersForSurvey
         fields = '__all__'
+
+    def create(self, validated_data):
+        answer_for_survey = AnswersForSurvey.objects.update_or_create(
+            survey_parent=validated_data.get('survey_parent', None),
+            user_answers=validated_data.get('user_answers', None)
+        )
+        return answer_for_survey
 
 
 class AnswerSerializer(serializers.ModelSerializer):
@@ -56,3 +65,16 @@ class AnswerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Answer
         fields = ('__all__')
+
+
+class AddUserSerializer(serializers.ModelSerializer):
+    '''Добавление пользователя'''
+    class Meta:
+        model = User
+        fields = '__all__'
+
+    def create(self, validated_data):
+        user_name = User.objects.create(
+            user_name=validated_data.get('user_name', None)
+        )
+

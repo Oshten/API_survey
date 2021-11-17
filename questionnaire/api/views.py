@@ -1,23 +1,27 @@
 
-from rest_framework import viewsets, generics
+from rest_framework import generics, permissions
 
 from .models import Survey, Answer
+from .permissions import SurveyPermission
 from .serializers import (
     SurveyDetalsSerializer,
     SurveyListSerializer,
-    AnswerCreateSerializer,
-    AnswerSerializer
+    CreateAnswersForSurveySerializer,
+    AnswerSerializer,
+    AddUserSerializer
 )
 
 
 class SurveyListView(generics.ListCreateAPIView):
     """Вывод опросов"""
 
+    queryset = Survey.objects.all()
     serializer_class = SurveyListSerializer
+    permission_classes = [SurveyPermission]
 
-    def get_queryset(self):
-        surveys = Survey.objects.all()
-        return surveys
+    # def get_queryset(self):
+    #     surveys = Survey.objects.all()
+    #     return surveys
 
 
 
@@ -28,10 +32,17 @@ class SurveyDetalsView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = SurveyDetalsSerializer
 
 
-class AnswerCreateView(viewsets.ModelViewSet):
-    '''Добавление ответов на вопросы'''
+class AddAnswersView(generics.CreateAPIView):
+    '''Добавление ответов на опросы'''
 
-    serializer_class = AnswerCreateSerializer
+    serializer_class = CreateAnswersForSurveySerializer
+
+class AddUserView(generics.CreateAPIView):
+    '''Добавление пользователя'''
+
+    serializer_class = AddUserSerializer
+
+
 
 class AnswerView(generics.ListAPIView):
     '''Вывод ответов на вопросы'''
