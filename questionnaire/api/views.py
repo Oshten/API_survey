@@ -9,6 +9,7 @@ from .serializers import (
     QuestionListSerializer,
     CreateAnswersForSurveySerializer,
     AnswerForSurveyDetalsSerializer,
+    CreateAnswerSerializer,
     AddUserSerializer
 )
 
@@ -93,6 +94,13 @@ class AnswerForSurveyDetalsView(
 
     def get(self, request, *args, **kwargs):
         return self.retrieve(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        serializer = CreateAnswerSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return request.Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)

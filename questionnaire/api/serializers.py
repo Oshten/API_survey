@@ -72,14 +72,40 @@ class CreateAnswersForSurveySerializer(serializers.ModelSerializer):
     #     return answers
 
 
+class CreateAnswerSerializer(serializers.ModelSerializer):
+    '''Добавление и вывод ответов на вопросы'''
+
+    class Meta:
+        model = Answer
+        fields = ('__all__')
+
+    def create(self, validated_data):
+        answer = Answer.objects.update_or_create(
+            question_for_answer=validated_data.get('question_for_answer', None),
+            answers_for_survey=validated_data.get('answers_for_survey', None),
+            default={'text_answer': validated_data.get('text_answer')},
+        )
+        return answer
+
+
 class AnswerForSurveyDetalsSerializer(serializers.ModelSerializer):
     '''Вывод деталей ответов на опросы'''
     surwey_parent = SurveyDetalsSerializer(read_only=True)
     user_answer = UserSerializer(read_only=True)
+    answers_for_survey = CreateAnswerSerializer(many=True)
 
     class Meta:
         model = AnswersForSurvey
-        fields = ('__all__')
+        fields = ('surwey_parent', 'answers_for_survey', 'user_answer', 'date_start_answers')
+
+    # def create(self, validated_data):
+    #     answer = AnswersForSurvey.objects.update_or_create(
+    #         surwey_parent=validated_data.get('surwey_parent', None),
+    #         user_answer=validated_data.get('user_answer', None),
+    #         answers_for_survey=validated_data.get('answers_for_survey', None)
+    #     )
+    #     return answer
+
 
 
 class AddUserSerializer(serializers.ModelSerializer):
