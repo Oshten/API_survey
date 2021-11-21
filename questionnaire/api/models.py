@@ -1,5 +1,20 @@
 from django.db import models
 
+class User(models.Model):
+    '''Пользователь'''
+
+    ip = models.CharField('IP адреc', max_length=15)
+    user_name = models.CharField('Имя пользователя', max_length=30, default=' ', blank=True)
+
+
+    def __str__(self):
+        return str(self.id)+ '. ' + self.user_name
+
+    class Meta:
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
+
+
 class Survey(models.Model):
 
     '''Опросы'''
@@ -77,53 +92,44 @@ class Question(models.Model):
         verbose_name = 'Вопрос'
         verbose_name_plural = 'Вопросы'
 
-class User(models.Model):
-    '''Пользователь'''
-    user_name = models.CharField('Имя пользователя', max_length=30, blank=True)
 
-    def __str__(self):
-        if not self.user_name:
-            return str(self.id)
-        return self.user_name
-
-    class Meta:
-        verbose_name = 'Пользователь'
-        verbose_name_plural = 'Пользователи'
 
 
 class AnswersForSurvey(models.Model):
     '''Ответы на опрос'''
 
-    surway_parent = models.ForeignKey(
-        Survey,
-        verbose_name='Опрос',
-        on_delete=models.CASCADE,
-        related_name='surway_parent'
-    )
-    user_answers = models.ForeignKey(
+    user_answer = models.ForeignKey(
         User,
         verbose_name='Пользователь',
         on_delete=models.CASCADE,
-        related_name='user_answers'
+        related_name='user_answer'
+    )
+    surwey_parent = models.ForeignKey(
+        Survey,
+        verbose_name='Опрос',
+        on_delete=models.CASCADE,
+        related_name='surwey_parent'
     )
     date_start_answers = models.DateTimeField('Время начала опроса', auto_now_add=True)
 
+
     def __str__(self):
-        return self.surway_parent
+        return self.surwey_parent
 
     class Meta:
         verbose_name = 'Ответ на опрос'
         verbose_name_plural = 'Ответы на опрос'
 
 
+
 class Answer(models.Model):
     '''Ответ на вопрос'''
     text_answer = models.TextField('Ответ')
-    answer = models.ForeignKey(
+    question_for_answer = models.ForeignKey(
         Question,
         verbose_name='Вопрос',
         on_delete=models.CASCADE,
-        related_name='answer'
+        related_name='question_for_answer'
     )
     answers_for_survey = models.ForeignKey(
             AnswersForSurvey,

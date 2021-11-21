@@ -1,13 +1,22 @@
+# from datetime import datetime
+# from django.utils.datetime_safe import datetime
 from rest_framework import serializers
 from .models import Question, Survey, User, AnswersForSurvey, Answer
 
+
+class UserSerializer(serializers.ModelSerializer):
+    '''Вывод вопроса'''
+
+    class Meta:
+        model = User
+        fields = ('id', 'ip', 'user_name',)
 
 class QuestionSerializer(serializers.ModelSerializer):
     '''Вывод вопросов'''
 
     class Meta:
         model = Question
-        fields = ('text_question', 'attachment')
+        fields = ('id', 'text_question', 'attachment')
 
 class QuestionListSerializer(serializers.ModelSerializer):
     '''Вывод вопросов одного опроса'''
@@ -17,12 +26,7 @@ class QuestionListSerializer(serializers.ModelSerializer):
         fields = ('__all__')
 
 
-class UserSerializer(serializers.ModelSerializer):
-    '''Вывод вопроса'''
 
-    class Meta:
-        model = User
-        fields = ('id', 'user_name')
 
 class SurveyDetalsSerializer(serializers.ModelSerializer):
     '''Вывод опроса с вопросами'''
@@ -35,7 +39,7 @@ class SurveyDetalsSerializer(serializers.ModelSerializer):
 
 
 class SurveySerializer(serializers.ModelSerializer):
-    '''Вывод опроса с вопросами'''
+    '''Вывод опроса'''
 
     class Meta:
         model = Survey
@@ -52,26 +56,29 @@ class SurveyListSerializer(serializers.ModelSerializer):
 
 class CreateAnswersForSurveySerializer(serializers.ModelSerializer):
     '''Добавление ответов на опрос'''
+    surwey_parent = SurveySerializer(read_only=True)
+    user_answer = UserSerializer(read_only=True)
 
     class Meta:
         model = AnswersForSurvey
         fields = '__all__'
 
-    def create(self, validated_data):
-        answer_for_survey = AnswersForSurvey.objects.update_or_create(
-            survey_parent=validated_data.get('survey_parent', None),
-            user_answers=validated_data.get('user_answers', None)
-        )
-        return answer_for_survey
+    # def create(self, validated_date):
+    #     answers = AnswersForSurvey.objects.update_or_create(
+    #         date_start_answers=str(datetime),
+    #         user_answer=validated_date.get('user_answer', None),
+    #         survey_parent=validated_date.get('survey_parent', None),
+    #     )
+    #     return answers
 
 
-class AnswerSerializer(serializers.ModelSerializer):
-    '''Вывод ответов на вопросы'''
-    answer = QuestionSerializer()
-    user_answer = UserSerializer()
+class AnswerForSurveyDetalsSerializer(serializers.ModelSerializer):
+    '''Вывод деталей ответов на опросы'''
+    surwey_parent = SurveyDetalsSerializer(read_only=True)
+    user_answer = UserSerializer(read_only=True)
 
     class Meta:
-        model = Answer
+        model = AnswersForSurvey
         fields = ('__all__')
 
 
@@ -82,7 +89,9 @@ class AddUserSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def create(self, validated_data):
-        user_name = User.objects.create(
+        user = User.objects.create(
+            ip=validated_data.get('ip', None),
             user_name=validated_data.get('user_name', None)
         )
+        return user
 
