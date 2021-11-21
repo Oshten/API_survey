@@ -7,7 +7,15 @@ class QuestionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Question
-        fields = ('text_question',)
+        fields = ('text_question', 'attachment')
+
+class QuestionListSerializer(serializers.ModelSerializer):
+    '''Вывод вопросов одного опроса'''
+
+    class Meta:
+        model = Question
+        fields = ('__all__')
+
 
 class UserSerializer(serializers.ModelSerializer):
     '''Вывод вопроса'''
