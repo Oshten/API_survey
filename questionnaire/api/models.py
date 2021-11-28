@@ -17,7 +17,7 @@ class User(models.Model):
 
 class Survey(models.Model):
 
-    '''Опросы'''
+    '''Опрос'''
 
     survey_name = models.CharField('Название', max_length=30)
     date_start = models.DateField('Дата старта', auto_now_add=True)
@@ -78,12 +78,6 @@ class Question(models.Model):
         on_delete=models.CASCADE,
         related_name='questions'
     )
-    # type_question = models.CharField(
-    #     'Тип вопроса',
-    #     max_length=30,
-    #     choices=CHOSE_TYPE_QUESTION,
-    #     help_text='Выбери тип вопроса: ответ текстом, выбор одного варианта, выбор нескольких вариантов'
-    # )
 
     def __str__(self):
         return self.text_question
@@ -95,14 +89,14 @@ class Question(models.Model):
 
 
 
-class AnswersForSurvey(models.Model):
+class Result(models.Model):
     '''Ответы на опрос'''
 
-    user_answer = models.ForeignKey(
+    user_result = models.ForeignKey(
         User,
         verbose_name='Пользователь',
         on_delete=models.CASCADE,
-        related_name='user_answer'
+        related_name='user_result'
     )
     surwey_parent = models.ForeignKey(
         Survey,
@@ -110,15 +104,15 @@ class AnswersForSurvey(models.Model):
         on_delete=models.CASCADE,
         related_name='surwey_parent'
     )
-    date_start_answers = models.DateTimeField('Время начала опроса', auto_now_add=True)
+    date_start_result = models.DateTimeField('Время начала ответов на опрос', auto_now_add=True)
 
 
     def __str__(self):
-        return self.surwey_parent
+        return self.surwey_parent.survey_name
 
     class Meta:
-        verbose_name = 'Ответ на опрос'
-        verbose_name_plural = 'Ответы на опрос'
+        verbose_name = 'Результат'
+        verbose_name_plural = 'Результаты'
 
 
 
@@ -132,8 +126,8 @@ class Answer(models.Model):
         related_name='question_for_answer'
     )
     answers_for_survey = models.ForeignKey(
-            AnswersForSurvey,
-            verbose_name='Ответ на опрос',
+            Result,
+            verbose_name='Результат',
             on_delete=models.CASCADE,
             related_name='answers_for_survey'
         )

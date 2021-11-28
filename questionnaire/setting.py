@@ -1,0 +1,1 @@
+SECRET_KEY = 'etva=j&+m*i3)3ab+n1iy259o=w296-s&kn@6xr#$&h2tr@=)h'

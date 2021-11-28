@@ -1,16 +1,20 @@
 
 from rest_framework import generics, permissions, status
 
-from .models import Survey, Question, AnswersForSurvey, Answer, User
+from .models import Survey, Question, Result, Answer, User
 from .permissions import SurveyPermission
 from .serializers import (
     SurveyDetalsSerializer,
     SurveyListSerializer,
-    QuestionListSerializer,
-    CreateAnswersForSurveySerializer,
-    AnswerForSurveyDetalsSerializer,
-    CreateAnswerSerializer,
-    AddUserSerializer
+    QuestionSerializer,
+    # QuestionListSerializer,
+    CreateResultSerializer,
+    ResultDetalsSerializer,
+    # CreateAnswerSerializer,
+    AnswersListSerializer,
+    AnswerDetalsSerializer,
+    AddUserSerializer,
+    AllUsersAndResultsSerializer
 )
 
 
@@ -40,7 +44,7 @@ class QuestionListView(
     generics.GenericAPIView):
     """Вывод вопросов одного опроса"""
 
-    serializer_class = QuestionListSerializer
+    serializer_class = QuestionSerializer
     permission_classes = [permissions.IsAdminUser]
 
     def get_queryset(self):
@@ -54,9 +58,6 @@ class QuestionListView(
     def post(self, request, *args, **kwargs):
         return self.create(request, *args, **kwargs)
 
-    # def perform_create(self, serializer):
-    #     serializer.save(attachment=models.Count(Survey, ip=self.kwargs["attachment"]))
-
     def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)
 
@@ -65,7 +66,7 @@ class QuestionListView(
 class QuestionDetalsView(generics.RetrieveUpdateDestroyAPIView):
     """Вывод вопроса для редактирования и удаления"""
 
-    serializer_class = QuestionListSerializer
+    serializer_class = QuestionSerializer
     permission_classes = [permissions.IsAdminUser]
 
     def get_queryset(self):
@@ -75,35 +76,39 @@ class QuestionDetalsView(generics.RetrieveUpdateDestroyAPIView):
 
 
 
-class AddAnswersView(generics.ListCreateAPIView):
+class AddResultView(generics.ListCreateAPIView):
     '''Добавление ответов на опросы'''
 
-    serializer_class = CreateAnswersForSurveySerializer
-    queryset = AnswersForSurvey.objects.all()
+    serializer_class = CreateResultSerializer
+    queryset = Result.objects.all()
+
+class AddAnswerView(generics.ListCreateAPIView):
+    '''Добавление ответов'''
+
+    serializer_class = AnswersListSerializer
+
+    def get_queryset(self):
+        answers_for_survey = self.kwargs['answers_for_survey']
+        answers = Answer.objects.filter(answers_for_survey=answers_for_survey)
+        return answers
 
 
-class AnswerForSurveyDetalsView(
-    generics.mixins.CreateModelMixin,
-    generics.mixins.RetrieveModelMixin,
-    generics.mixins.DestroyModelMixin,
-    generics.GenericAPIView):
+class ResultDetalsView(generics.RetrieveAPIView):
     '''Вывод деталей опроса с вопросами'''
 
-    serializer_class = AnswerForSurveyDetalsSerializer
-    queryset = AnswersForSurvey.objects.all()
+    serializer_class = ResultDetalsSerializer
+    queryset = Result.objects.all()
 
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
+class AnswerDetalsView(generics.RetrieveUpdateDestroyAPIView):
+    '''Вывод деталей, редактирование и удаление ответа'''
 
-    def post(self, request, *args, **kwargs):
-        serializer = CreateAnswerSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return request.Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+    serializer_class = AnswerDetalsSerializer
 
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
+    def get_queryset(self):
+        answers_for_survey = self.kwargs['answers_for_survey']
+        answer = Answer.objects.filter(answers_for_survey=answers_for_survey)
+        return answer
+
 
 
 class AddUserView(generics.CreateAPIView):
@@ -112,17 +117,14 @@ class AddUserView(generics.CreateAPIView):
     serializer_class = AddUserSerializer
     queryset = User.objects.all()
 
+class AllUsersAndResultsView(generics.ListAPIView):
+    '''Вывод всех пользователей и их ответы'''
+
+    serializer_class = AllUsersAndResultsSerializer
+    permission_classes = [permissions.IsAdminUser,]
+    queryset = User.objects.all()
 
 
-
-
-# class AnswerView(generics.ListAPIView):
-#     '''Вывод ответов на вопросы'''
-#
-#     serializer_class = AnswerSerializer
-#     def get_queryset(self):
-#         answers = Answer.objects.all()
-#         return answers
 
 
 
